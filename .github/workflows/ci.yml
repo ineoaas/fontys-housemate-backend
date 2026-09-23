@@ -13,6 +13,22 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: housemate
+          MYSQL_USER: housemate
+          MYSQL_PASSWORD: housemate
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,6 +44,12 @@ jobs:
 
       - name: Run tests
         run: ./gradlew test --no-daemon
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: "3306"
+          DB_NAME: housemate
+          DB_USERNAME: housemate
+          DB_PASSWORD: housemate
 
   build:
     needs: test
